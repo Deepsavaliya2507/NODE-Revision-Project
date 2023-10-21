@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    Image: {
+      type: mongoose.Types.ObjectId,
+      ref: "Image",
+    },
     is_active: {
       type: Boolean,
       default: true,

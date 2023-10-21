@@ -28,10 +28,10 @@ new CronJob(
 
 /** Send email */
 new CronJob(
-  "36 8 * * *",
+  "33 10 * * *",
   function () {
     emailService.sendMail(
-      "rajeshsavaliya76@gmail.com",
+      "deepsavaliya972@gmail.com",
       "Morning message",
       "hello, this is deep! Good morning! Have a nice day :)"
     );
