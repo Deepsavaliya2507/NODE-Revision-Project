@@ -22,12 +22,12 @@ const getImageList = async (filter, options) => {
 };
 
 /**
- * Get image by email
- * @param {string} email
+ * Get image by images_name
+ * @param {string} images_name
  * @returns {Promise<image>}
  */
-const getImageByEmail = async (email) => {
-  return Image.findOne({ email });
+const getImageByImages = async (images_name) => {
+  return Image.findOne({ images_name });
 };
 
 /**
@@ -63,6 +63,6 @@ module.exports = {
   getImageList,
   getImageById,
   updateDetails,
-  getImageByEmail,
+  getImageByImages,
   deleteImage,
 };

@@ -12,9 +12,9 @@ const createImage = async (req, res) => {
       throw new Error("Product image is required!");
     }
 
-    const imageExists = await imageService.getImageByEmail(reqBody.email);
+    const imageExists = await imageService.getImageByImages(reqBody.image_image);
     if (imageExists) {
-      throw new Error("image already created by this email!");
+      throw new Error("image already created!");
     }
 
     const image = await imageService.createImage(reqBody);
@@ -40,8 +40,8 @@ const getImageList = async (req, res) => {
 
     if (search) {
       filter.$or = [
-        { first_name: { $regex: search, $options: "i" } },
-        { last_name: { $regex: search, $options: "i" } },
+        { images_name: { $regex: search, $options: "i" } },
+        { images_description: { $regex: search, $options: "i" } },
       ];
     }
 

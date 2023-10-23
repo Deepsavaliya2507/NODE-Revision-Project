@@ -12,7 +12,7 @@ const imagesSchema = new mongoose.Schema(
       trim: true,
     },
     image: {
-      type: Array,
+      type: String,
       trim: true,
     },
     is_active: {

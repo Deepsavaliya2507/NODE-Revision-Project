@@ -9,7 +9,7 @@ const router = express.Router();
 /** create image */
 router.post(
   "/create-image",
-  upload.single("image_image"),
+  upload.single("image"),
   validate(imageValidation.createImage),
   imageController.createImage
 );
