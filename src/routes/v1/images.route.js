@@ -1,6 +1,6 @@
 const express = require("express");
 const { imageValidation } = require("../../validations");
-const { imageController } = require("../../controllers");
+const { imageController } = require("../../controllers")
 const validate = require("../../middlewares/validate");
 const {upload }=require("../../middlewares/upload");
 
@@ -25,14 +25,14 @@ router.get(
 router.get(
   "/get-details/:imageId",
   validate(imageValidation.getDetails),
-  imageController.getImageDetails
+  imageController.getDetails
 );
 
 /** image details update by id */
 router.put(
   "/update-details/:imageId",
   validate(imageValidation.updateDetails),
-  imageController.updateDetails
+  imageController.updateImage
 );
 
 /** Delete image */

@@ -34,7 +34,7 @@ const updateDetails = {
   body: Joi.object().keys({
     images_name: Joi.string().trim(),
     images_description: Joi.string().trim(),
-    image: Joi.string().email().required(),
+    image: Joi.string().allow(),
   }),
 };
 

@@ -1,98 +1,174 @@
 const fs = require("fs");
-const { imageService, emailService } = require("../services");
+const { imageService } = require("../services");
 
-/** create image */
+/** Create image */
 const createImage = async (req, res) => {
   try {
     const reqBody = req.body;
 
     if (req.file) {
-      reqBody.image_image  = req.file.filename;
+      reqBody.image_image = req.file.filename;
     } else {
-      throw new Error("Product image is required!");
+      throw new Error("image image is required!");
     }
 
-    const imageExists = await imageService.getImageByImages(reqBody.image_image);
-    if (imageExists) {
-      throw new Error("image already created!");
-    }
-
-    const image = await imageService.createImage(reqBody);
-    if (!image) {
-      throw new Error("Something went wrong, please try again or later!");
-    }
+    const createdImage = await imageService.createImage(reqBody);
 
     res.status(200).json({
       success: true,
       message: "image create successfully!",
-      data: { image },
+      data: createdImage,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
   }
 };
 
-/** Get image list */
-const getImageList = async (req, res) => {
+/** Multiple image */
+const multipleImage = async (req, res) => {
   try {
-    const { search, ...options } = req.query;
-    let filter = {};
+    const reqBody = req.body;
 
-    if (search) {
-      filter.$or = [
-        { images_name: { $regex: search, $options: "i" } },
-        { images_description: { $regex: search, $options: "i" } },
-      ];
+    image_image = [];
+    if (req.files) {
+      for (let ele of req.files) {
+        image_image.push(ele.filename);
+      }
+    } else {
+      throw new Error("image image is required!");
     }
 
-    const getList = await imageService.getImageList(filter, options);
+    reqBody.image_image = image_image;
+
+    const createdImage = await imageService.createImage(reqBody);
 
     res.status(200).json({
       success: true,
-      message: "Get image list successfully!",
-      data: getList,
+      message: "image create successfully!",
+      data: createdImage,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
   }
 };
 
-/** Get image details by id */
-const getImageDetails = async (req, res) => {
+/** Get image details */
+const getDetails = async (req, res) => {
   try {
-    const getDetails = await imageService.getImageById(req.params.imageId);
-    if (!getDetails) {
+    const imageExists = await imageService.getImageById(
+      req.params.imageId
+    );
+    if (!imageExists) {
       throw new Error("image not found!");
     }
 
     res.status(200).json({
       success: true,
       message: "image details get successfully!",
-      data: getDetails,
+      data: imageExists,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
   }
 };
 
-/** image details update by id */
-const updateDetails = async (req, res) => {
+/** Get image list */
+const getImageList = async (req, res) => {
   try {
+    const getList = await imageService.getImageList();
+
+    res.status(200).json({
+      success: true,
+      data: getList,
+    });
+  } catch (error) {
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
+  }
+};
+
+/** Update image details */
+const updateImage = async (req, res) => {
+  try {
+    const reqBody = req.body;
     const imageId = req.params.imageId;
     const imageExists = await imageService.getImageById(imageId);
     if (!imageExists) {
       throw new Error("image not found!");
     }
 
-    await imageService.updateDetails(imageId, req.body);
+    if (req.file) {
+      reqBody.image_image = req.file.filename;
+    }
 
-    res
-      .status(200)
-      .json({ success: true, message: "image details update successfully!" });
+    const updatedImage = await imageService.updateImage(
+      imageId,
+      reqBody
+    );
+    if (updatedImage) {
+      if (req.file) {
+        const filePath = `./public/image/${imageExists.image_image}`;
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+    } else {
+      throw new Error("Something went wrong, please try again or later!");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "image details update successfully!",
+      data: updatedImage,
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
   }
 };
+
+/** Manage image status */
+// const manageImageStatus = async (req, res) => {
+//   try {
+//     const manageStatus = await imageService.manageImageStatus(
+//       req.params.imageId
+//     );
+
+//     let resMessage = manageStatus.is_active
+//       ? "image can enable to sale."
+//       : "image can not enable to sale";
+
+//     res.status(200).json({
+//       success: true,
+//       message: resMessage,
+//       data: manageStatus,
+//     });
+//   } catch (error) {
+//     res.status(error?.statusCode || 400).json({
+//       success: false,
+//       message:
+//         error?.message || "Something went wrong, please try again or later!",
+//     });
+//   }
+// };
 
 /** Delete image */
 const deleteImage = async (req, res) => {
@@ -103,21 +179,36 @@ const deleteImage = async (req, res) => {
       throw new Error("image not found!");
     }
 
-    await imageService.deleteImage(imageId);
+    const deletedImage = await imageService.deleteImage(imageId);
+    if (deletedImage) {
+      const filePath = `./public/image_images/${imageExists.image_image}`;
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } else {
+      throw new Error("Something went wrong, please try again or later!");
+    }
 
     res.status(200).json({
       success: true,
       message: "image delete successfully!",
+      data: deletedImage,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error?.statusCode || 400).json({
+      success: false,
+      message:
+        error?.message || "Something went wrong, please try again or later!",
+    });
   }
 };
 
 module.exports = {
   createImage,
+  multipleImage,
+  getDetails,
   getImageList,
-  getImageDetails,
-  updateDetails,
+  updateImage,
+  // manageImageStatus,
   deleteImage,
 };
