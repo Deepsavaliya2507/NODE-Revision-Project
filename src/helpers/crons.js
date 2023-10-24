@@ -3,17 +3,6 @@ const { start } = require("repl");
 const config = require("../config/config");
 const { emailService } = require("../services");
 
-/** It's running on every 3 seconds. */
-// new CronJob(
-//   "*/3 * * * * *",
-//   function () {
-//     console.log("It's running on every 3 seconds.");
-//   },
-//   null,
-//   false,
-//   "Asia/Kolkata"
-// ).start();
-
 /** It's running on when clock time is 7:45 of 24 hours */
 new CronJob(
   "45 7 * * *",
@@ -28,8 +17,9 @@ new CronJob(
 
 /** Send email */
 new CronJob(
-  "33 10 * * *",
+  "00 10 * * *",
   function () {
+    console.log("It's running on when clock time is 7:45");
     emailService.sendMail(
       "deepsavaliya972@gmail.com",
       "Morning message",
